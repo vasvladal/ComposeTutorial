@@ -1,0 +1,19 @@
+# Machine-specific — never commit this (contains your local SDK path)
+local.properties
+
+# Build output
+*.iml
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Android Studio / IntelliJ
+.idea/
+*.hprof
+
+# Keystores (never commit real signing keys)
+*.jks
+*.keystore
+.vscode/

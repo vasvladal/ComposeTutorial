@@ -1,0 +1,854 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: app/src/main/java/com/example/composetutorial/components/CounterButton.kt, app/src/main/java/com/example/composetutorial/components/GreetingCard.kt, app/src/main/java/com/example/composetutorial/components/ProfileForm.kt, app/src/main/java/com/example/composetutorial/components/TaskList.kt, app/src/main/java/com/example/composetutorial/ui/theme/Color.kt, app/src/main/java/com/example/composetutorial/ui/theme/Theme.kt, app/src/main/java/com/example/composetutorial/ui/theme/Type.kt, app/src/main/java/com/example/composetutorial/MainActivity.kt, app/src/main/res/values/strings.xml, app/src/main/res/values/styles.xml, app/src/main/AndroidManifest.xml, app/build.gradle.kts, app/proguard-rules.pro, gradle/wrapper/gradle-wrapper.properties, gradle/gradle-daemon-jvm.properties, gradle/libs.versions.toml, gradle.properties, local.properties, settings.gradle.kts, app/src/main/res/drawable/ic_launcher_background.xml, app/src/main/res/drawable/ic_launcher_foreground.xml, app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml, app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+app/
+  src/
+    main/
+      java/
+        com/
+          example/
+            composetutorial/
+              components/
+                CounterButton.kt
+                GreetingCard.kt
+                ProfileForm.kt
+                TaskList.kt
+              ui/
+                theme/
+                  Color.kt
+                  Theme.kt
+                  Type.kt
+              MainActivity.kt
+      res/
+        drawable/
+          ic_launcher_background.xml
+          ic_launcher_foreground.xml
+        mipmap-anydpi-v26/
+          ic_launcher_round.xml
+          ic_launcher.xml
+        values/
+          strings.xml
+          styles.xml
+      AndroidManifest.xml
+  build.gradle.kts
+  proguard-rules.pro
+gradle/
+  wrapper/
+    gradle-wrapper.properties
+  gradle-daemon-jvm.properties
+  libs.versions.toml
+gradle.properties
+local.properties
+settings.gradle.kts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="app/src/main/java/com/example/composetutorial/components/CounterButton.kt">
+package com.example.composetutorial.components
+
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.composetutorial.ui.theme.ComposeTutorialTheme
+
+/**
+ * Demonstrates local, in-memory state and recomposition - the core idea
+ * behind Compose's reactive model.
+ *
+ * `remember { mutableIntStateOf(0) }` creates a piece of observable state
+ * that survives recomposition (but NOT configuration changes like screen
+ * rotation - for that you'd use `rememberSaveable` instead).
+ *
+ * Reading `count` inside this function makes Compose track this composable
+ * as a "reader". When `count` changes, ONLY this composable (and anything
+ * that reads it) is re-invoked and redrawn - not the whole screen.
+ */
+@Composable
+fun CounterButton(modifier: Modifier = Modifier) {
+    var count by remember { mutableIntStateOf(0) }
+
+    Row(modifier = modifier.padding(16.dp)) {
+        Button(onClick = { count++ }) {
+            Text("Tap me")
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = "Clicked $count times",
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CounterButtonPreview() {
+    ComposeTutorialTheme {
+        CounterButton()
+    }
+}
+</file>
+
+<file path="app/src/main/java/com/example/composetutorial/components/GreetingCard.kt">
+package com.example.composetutorial.components
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.composetutorial.ui.theme.ComposeTutorialTheme
+
+/**
+ * The simplest possible composable: it takes data in through parameters
+ * and emits UI. No internal state, no side effects - call it "stateless".
+ *
+ * @param name text shown as the greeting target.
+ * @param modifier lets the CALLER control layout (size, padding, clicks...)
+ *        without GreetingCard needing to know about any of that. Every
+ *        composable that draws something should accept a Modifier like this.
+ */
+@Composable
+fun GreetingCard(name: String, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Hello,",
+                style = MaterialTheme.typography.labelSmall
+            )
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
+    }
+}
+
+// A @Preview composable is never shipped in the app; Android Studio uses it
+// to render this one component in the "Design" pane without running the
+// whole app or a device/emulator.
+@Preview(showBackground = true)
+@Composable
+private fun GreetingCardPreview() {
+    ComposeTutorialTheme {
+        GreetingCard(name = "Jetpack Compose")
+    }
+}
+</file>
+
+<file path="app/src/main/java/com/example/composetutorial/components/ProfileForm.kt">
+package com.example.composetutorial.components
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.composetutorial.ui.theme.ComposeTutorialTheme
+
+/**
+ * Shows a simple, one-way-bound text input: state lives outside the
+ * TextField (in `remember { mutableStateOf(...) }`) and is fed back in
+ * through `value` / `onValueChange`. This "state hoisting" pattern - the
+ * composable doesn't own its own state, the caller does - is what makes
+ * Compose UI predictable and easy to test.
+ */
+@Composable
+fun ProfileForm(modifier: Modifier = Modifier) {
+    var text by remember { mutableStateOf("") }
+
+    Column(modifier = modifier.padding(16.dp)) {
+        Text(
+            text = "Your name",
+            style = MaterialTheme.typography.labelSmall
+        )
+        OutlinedTextField(
+            value = text,
+            onValueChange = { newValue -> text = newValue },
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text("Type something...") },
+            singleLine = true
+        )
+        if (text.isNotBlank()) {
+            Text(
+                text = "Nice to meet you, $text!",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ProfileFormPreview() {
+    ComposeTutorialTheme {
+        ProfileForm()
+    }
+}
+</file>
+
+<file path="app/src/main/java/com/example/composetutorial/components/TaskList.kt">
+package com.example.composetutorial.components
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import com.example.composetutorial.ui.theme.ComposeTutorialTheme
+
+/** A single to-do item. A plain `data class` - no Compose or Android types needed. */
+data class Task(val title: String, val done: Boolean = false)
+
+/**
+ * LazyColumn is Compose's equivalent of RecyclerView: it only composes and
+ * lays out the items currently visible on screen, which is what makes it
+ * efficient for long or unbounded lists. Never use a plain Column with a
+ * for-loop for lists that can grow large.
+ */
+@Composable
+fun TaskList(modifier: Modifier = Modifier) {
+    // mutableStateListOf gives you an observable MutableList: adding,
+    // removing, or replacing elements triggers recomposition automatically.
+    val tasks = remember {
+        mutableStateListOf(
+            Task("Learn Composable functions"),
+            Task("Understand state & recomposition"),
+            Task("Build a layout with Modifiers"),
+            Task("Try Material 3 components")
+        )
+    }
+
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)
+    ) {
+        items(tasks) { task ->
+            TaskRow(
+                task = task,
+                onToggle = {
+                    val index = tasks.indexOf(task)
+                    if (index != -1) tasks[index] = task.copy(done = !task.done)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun TaskRow(task: Task, onToggle: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(checked = task.done, onCheckedChange = { onToggle() })
+            Text(
+                text = task.title,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, heightDp = 300)
+@Composable
+private fun TaskListPreview() {
+    ComposeTutorialTheme {
+        TaskList()
+    }
+}
+</file>
+
+<file path="app/src/main/java/com/example/composetutorial/ui/theme/Color.kt">
+package com.example.composetutorial.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+// Light color palette
+val PurpleLight = Color(0xFF6650a4)
+val PurpleGreyLight = Color(0xFF625b71)
+val PinkLight = Color(0xFF7D5260)
+
+// Dark color palette
+val PurpleDark = Color(0xFFD0BCFF)
+val PurpleGreyDark = Color(0xFFCCC2DC)
+val PinkDark = Color(0xFFEFB8C8)
+</file>
+
+<file path="app/src/main/java/com/example/composetutorial/ui/theme/Theme.kt">
+package com.example.composetutorial.ui.theme
+
+import android.app.Activity
+import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+
+private val DarkColorScheme = darkColorScheme(
+    primary = PurpleDark,
+    secondary = PurpleGreyDark,
+    tertiary = PinkDark
+)
+
+private val LightColorScheme = lightColorScheme(
+    primary = PurpleLight,
+    secondary = PurpleGreyLight,
+    tertiary = PinkLight
+)
+
+/**
+ * App-wide theme. Wrap your top-level composable in this once (see MainActivity)
+ * and every composable below it automatically picks up the right colors,
+ * typography and shapes through MaterialTheme.
+ */
+@Composable
+fun ComposeTutorialTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    // Dynamic color is available on Android 12+ and derives the palette
+    // from the user's wallpaper.
+    dynamicColor: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
+    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = AppTypography,
+        content = content
+    )
+}
+</file>
+
+<file path="app/src/main/java/com/example/composetutorial/ui/theme/Type.kt">
+package com.example.composetutorial.ui.theme
+
+import androidx.compose.material3.Typography
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
+// Material 3 defines a whole type scale (displayLarge down to labelSmall).
+// You only need to override the styles you actually use; everything else
+// falls back to Material's sensible defaults.
+val AppTypography = Typography(
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp
+    ),
+    titleLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 22.sp,
+        lineHeight = 28.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    )
+)
+</file>
+
+<file path="app/src/main/java/com/example/composetutorial/MainActivity.kt">
+package com.example.composetutorial
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.composetutorial.components.CounterButton
+import com.example.composetutorial.components.GreetingCard
+import com.example.composetutorial.components.ProfileForm
+import com.example.composetutorial.components.TaskList
+import com.example.composetutorial.ui.theme.ComposeTutorialTheme
+
+/**
+ * The single Activity that hosts the whole Compose UI (see the "single
+ * Activity architecture" pattern - typical for Compose apps).
+ *
+ * Everything below setContent { ... } is Compose: no XML layouts, no
+ * findViewById, no fragments involved.
+ */
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            // Applying the theme once at the root makes MaterialTheme.colorScheme
+            // and MaterialTheme.typography available to every composable below.
+            ComposeTutorialTheme {
+                TutorialApp()
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TutorialApp() {
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("Jetpack Compose Tutorial") })
+        }
+    ) { innerPadding ->
+        // Surface paints the Material background color behind the content.
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                SectionLabel("1. A stateless composable")
+                GreetingCard(
+                    name = "Jetpack Compose",
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                SectionLabel("2. State & recomposition")
+                CounterButton()
+
+                SectionLabel("3. State hoisting with a text field")
+                ProfileForm()
+
+                SectionLabel("4. Lists with LazyColumn")
+                TaskList(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Column {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(start = 16.dp, top = 20.dp, bottom = 4.dp)
+        )
+        HorizontalDivider()
+    }
+}
+
+@Preview(showBackground = true, heightDp = 1200)
+@Composable
+private fun TutorialAppPreview() {
+    ComposeTutorialTheme {
+        TutorialApp()
+    }
+}
+</file>
+
+<file path="app/src/main/res/drawable/ic_launcher_background.xml">
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#6650a4"
+        android:pathData="M0,0h108v108h-108z" />
+</vector>
+</file>
+
+<file path="app/src/main/res/drawable/ic_launcher_foreground.xml">
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,30 L78,54 L54,78 L30,54 Z" />
+</vector>
+</file>
+
+<file path="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml">
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>
+</file>
+
+<file path="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml">
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>
+</file>
+
+<file path="app/src/main/res/values/strings.xml">
+<resources>
+    <string name="app_name">ComposeTutorial</string>
+</resources>
+</file>
+
+<file path="app/src/main/res/values/styles.xml">
+<resources>
+    <!-- Minimal launch theme; Compose draws all real UI. -->
+    <style name="Theme.ComposeTutorial" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
+</file>
+
+<file path="app/src/main/AndroidManifest.xml">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.ComposeTutorial"
+        android:supportsRtl="true">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ComposeTutorial">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>
+</file>
+
+<file path="app/build.gradle.kts">
+plugins {
+alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
+}
+
+android {
+    namespace = "com.example.composetutorial"
+    compileSdk = 37
+
+    defaultConfig {
+        applicationId = "com.example.composetutorial"
+        minSdk = 24
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
+testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    //kotlinOptions {
+    //    jvmTarget = "17"
+    //}
+
+    buildFeatures {
+        compose = true
+    }
+packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+}
+// ?? kotlin ???
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
+}
+
+dependencies {
+    // Compose BOM keeps every Compose library on a matching, tested version.
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    // Compose libraries (versions resolved by the BOM above)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
+
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+}
+</file>
+
+<file path="app/proguard-rules.pro">
+# Add project specific ProGuard rules here.
+</file>
+
+<file path="gradle/wrapper/gradle-wrapper.properties">
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionSha256Sum=bbaeb2fef8710818cf0e261201dab964c572f92b942812df0c3620d62a529a01
+distributionUrl=https\://services.gradle.org/distributions/gradle-9.7.1-bin.zip
+networkTimeout=10000
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+</file>
+
+<file path="gradle/gradle-daemon-jvm.properties">
+#This file is generated by updateDaemonJvm
+toolchainUrl.FREE_BSD.AARCH64=https\://api.foojay.io/disco/v3.0/ids/491f83666ae7f4d6ebb28fee72ebb035/redirect
+toolchainUrl.FREE_BSD.X86_64=https\://api.foojay.io/disco/v3.0/ids/0d1a1acdc708062093673f65aa9aba4b/redirect
+toolchainUrl.LINUX.AARCH64=https\://api.foojay.io/disco/v3.0/ids/491f83666ae7f4d6ebb28fee72ebb035/redirect
+toolchainUrl.LINUX.X86_64=https\://api.foojay.io/disco/v3.0/ids/0d1a1acdc708062093673f65aa9aba4b/redirect
+toolchainUrl.MAC_OS.AARCH64=https\://api.foojay.io/disco/v3.0/ids/7083b89563e7ce20943037b8cd2b8cc2/redirect
+toolchainUrl.MAC_OS.X86_64=https\://api.foojay.io/disco/v3.0/ids/060bbb778a1f55ea705fdebd2ccfeab9/redirect
+toolchainUrl.UNIX.AARCH64=https\://api.foojay.io/disco/v3.0/ids/491f83666ae7f4d6ebb28fee72ebb035/redirect
+toolchainUrl.UNIX.X86_64=https\://api.foojay.io/disco/v3.0/ids/0d1a1acdc708062093673f65aa9aba4b/redirect
+toolchainUrl.WINDOWS.AARCH64=https\://api.foojay.io/disco/v3.0/ids/d09679dc60fe5aa05ef7d03efdefac20/redirect
+toolchainUrl.WINDOWS.X86_64=https\://api.foojay.io/disco/v3.0/ids/ed4e3bf2f5e7c5d9aabc4cbd8acd555e/redirect
+toolchainVendor=JETBRAINS
+toolchainVersion=21
+</file>
+
+<file path="gradle/libs.versions.toml">
+[versions]
+agp = "9.4.1"
+kotlin = "2.4.20"
+coreKtx = "1.19.1"
+lifecycleRuntimeKtx = "2.11.0"
+activityCompose = "1.13.0"
+composeBom = "2026.09.00"
+junit = "4.13.2"
+androidxTestExtJunit = "1.2.1"
+espressoCore = "3.6.1"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+
+# Compose BOM pins every Compose library below it to a matching, tested
+# version, so none of the Compose libraries need their own version here.
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+</file>
+
+<file path="gradle.properties">
+org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+android.useAndroidX=true
+android.nonTransitiveRClass=true
+kotlin.code.style=official
+</file>
+
+<file path="local.properties">
+## This file must *NOT* be checked into Version Control Systems,
+# as it contains information specific to your local configuration.
+#
+# Location of the SDK. This is only used by Gradle.
+# For customization when using a Version Control System, please read the
+# header note.
+#Thu Sep 24 13:25:16 MSK 2026
+sdk.dir=D\:\\AndroidSDK
+</file>
+
+<file path="settings.gradle.kts">
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "ComposeTutorial"
+include(":app")
+</file>
+
+</files>

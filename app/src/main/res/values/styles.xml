@@ -1,0 +1,4 @@
+<resources>
+    <!-- Minimal launch theme; Compose draws all real UI. -->
+    <style name="Theme.ComposeTutorial" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

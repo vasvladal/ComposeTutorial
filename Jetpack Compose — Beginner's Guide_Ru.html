@@ -1,0 +1,743 @@
+# Jetpack Compose — Руководство для начинающих
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jetpack Compose — Руководство для начинающих</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-alt: #f6f5f9;
+    --text: #1c1b1f;
+    --text-muted: #625b71;
+    --border: #e4e1ea;
+    --accent: #6650a4;
+    --accent-soft: #eee8fb;
+    --code-bg: #1e1b2e;
+    --code-text: #e9e4f5;
+    --nav-width: 280px;
+    --radius: 10px;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg: #141218;
+      --bg-alt: #1d1b22;
+      --text: #e6e1e9;
+      --text-muted: #cac4d0;
+      --border: #322f38;
+      --accent: #d0bcff;
+      --accent-soft: #322a45;
+      --code-bg: #0f0d16;
+      --code-text: #e9e4f5;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141218;
+    --bg-alt: #1d1b22;
+    --text: #e6e1e9;
+    --text-muted: #cac4d0;
+    --border: #322f38;
+    --accent: #d0bcff;
+    --accent-soft: #322a45;
+    --code-bg: #0f0d16;
+    --code-text: #e9e4f5;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: calc(24px + env(safe-area-inset-top, 0px)); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  a { color: var(--accent); }
+
+  /* Layout */
+  .app {
+    display: flex;
+    min-height: 100vh;
+  }
+  nav#sidebar {
+    width: var(--nav-width);
+    flex-shrink: 0;
+    background: var(--bg-alt);
+    border-right: 1px solid var(--border);
+    padding: env(safe-area-inset-top, 0px) 0 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .brand {
+    padding: 22px 22px 16px 22px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .brand .kicker {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: 0 0 4px 0;
+  }
+  .brand h1 {
+    font-size: 18px;
+    margin: 0;
+    line-height: 1.3;
+  }
+  nav#sidebar .group-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 16px 22px 6px 22px;
+  }
+  nav#sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  nav#sidebar a {
+    display: block;
+    padding: 8px 22px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14.5px;
+    border-left: 3px solid transparent;
+  }
+  nav#sidebar a:hover {
+    background: var(--accent-soft);
+  }
+  nav#sidebar a.active {
+    border-left-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  main {
+    flex: 1;
+    min-width: 0;
+    max-width: 880px;
+    padding: 40px 48px 80px 48px;
+  }
+  @media (max-width: 900px) {
+    .app { display: block; }
+    nav#sidebar {
+      position: static;
+      width: 100%;
+      height: auto;
+      top: auto;
+    }
+    main { padding: 28px 20px 60px 20px; max-width: 100%; }
+  }
+
+  section { margin-bottom: 56px; scroll-margin-top: 20px; }
+  section:first-of-type { margin-top: 0; }
+  h1 { font-size: 30px; margin: 0 0 10px 0; }
+  h2 {
+    font-size: 24px;
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 18px; margin: 28px 0 10px 0; color: var(--accent); }
+  p { color: var(--text); }
+  .lede { color: var(--text-muted); font-size: 16px; }
+
+  code {
+    background: var(--accent-soft);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.9em;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px 18px;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .card {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .file-path {
+    display: inline-block;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 13px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .tree {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px 18px;
+    border-radius: var(--radius);
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th { color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 12px 16px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 16px 0;
+    font-size: 14.5px;
+  }
+  .callout strong { color: var(--accent); }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 700px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .top-link { font-size: 13px; }
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  footer {
+    color: var(--text-muted);
+    font-size: 13px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <nav id="sidebar">
+    <div class="brand">
+      <p class="kicker">Руководство для начинающих</p>
+      <h1>Учебник по Jetpack Compose</h1>
+    </div>
+
+    <p class="group-title">Начало работы</p>
+    <ul>
+      <li><a href="#intro">Введение</a></li>
+      <li><a href="#setup">Открытие проекта</a></li>
+      <li><a href="#structure">Структура проекта</a></li>
+    </ul>
+
+    <p class="group-title">Файлы проекта</p>
+    <ul>
+      <li><a href="#version-catalog">gradle/libs.versions.toml</a></li>
+      <li><a href="#gradle-root">Корневой build.gradle.kts</a></li>
+      <li><a href="#gradle-app">app/build.gradle.kts</a></li>
+      <li><a href="#settings">settings.gradle.kts</a></li>
+      <li><a href="#daemon-jvm">gradle-daemon-jvm.properties</a></li>
+      <li><a href="#local-properties">local.properties</a></li>
+      <li><a href="#manifest">AndroidManifest.xml</a></li>
+      <li><a href="#icons">Ресурсы иконки приложения</a></li>
+      <li><a href="#main-activity">MainActivity.kt</a></li>
+      <li><a href="#theme-files">Файлы ui/theme</a></li>
+      <li><a href="#components">Файлы components/</a></li>
+    </ul>
+
+    <p class="group-title">Фреймворк Jetpack Compose</p>
+    <ul>
+      <li><a href="#what-is-compose">Что такое Compose</a></li>
+      <li><a href="#composable-functions">Composable-функции</a></li>
+      <li><a href="#state">Состояние и рекомпозиция</a></li>
+      <li><a href="#modifiers">Модификаторы</a></li>
+      <li><a href="#layouts">Макеты</a></li>
+      <li><a href="#lists">Списки: LazyColumn</a></li>
+      <li><a href="#material3">Компоненты Material 3</a></li>
+      <li><a href="#theming">Темизация</a></li>
+      <li><a href="#previews">Превью</a></li>
+    </ul>
+
+    <p class="group-title">Куда двигаться дальше</p>
+    <ul>
+      <li><a href="#exercises">Попробуйте сами</a></li>
+      <li><a href="#resources">Дополнительные ресурсы</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <section id="intro">
+      <h1>Jetpack Compose — Руководство для начинающих</h1>
+      <p class="lede">Разбор проекта <code>ComposeTutorial</code> в Android Studio: что делает каждый файл и как на самом деле работает фреймворк Jetpack Compose, лежащий в его основе.</p>
+      <div class="callout">
+        <strong>Для кого это</strong> — вы немного знаете Kotlin, уже открывали Android Studio и хотите понять Compose с самых основ, а не копировать готовые фрагменты кода.
+      </div>
+      <p>Jetpack Compose — это современный <strong>декларативный</strong> UI-инструментарий Android. Вместо императивного изменения XML-представлений (<code>findViewById</code>, <code>view.text = "..."</code>) вы описываете, <em>как</em> должен выглядеть интерфейс при заданном состоянии, а Compose сам решает, <em>как</em> обновить экран при изменении этого состояния.</p>
+    </section>
+
+    <section id="setup">
+      <h2>Открытие проекта</h2>
+      <ol>
+        <li>Установите <strong>Android Studio</strong> (свежую стабильную версию), если ещё не сделали этого.</li>
+        <li><code>File → Open…</code> и выберите распакованную папку <code>ComposeTutorial</code>.</li>
+        <li>Дождитесь окончания синхронизации Gradle — Android Studio скачает зависимости, перечисленные в файлах Gradle (о них ниже).</li>
+        <li>Выберите конфигурацию запуска <code>app</code> и нажмите <strong>Run</strong> на эмуляторе или подключённом устройстве (минимум Android 7.0 / API 24).</li>
+      </ol>
+      <div class="callout">Нет эмулятора под рукой? У каждого экрана в этом проекте есть <code>@Preview</code>, поэтому вы можете просматривать и дорабатывать интерфейс прямо в панели Design в Android Studio — см. <a href="#previews">Превью</a>.</div>
+    </section>
+
+    <section id="structure">
+      <h2>Структура проекта</h2>
+      <p>Вот полная структура учебного проекта. Всё, что находится в <code>app/src/main/java/…/composetutorial</code>, — это код на Kotlin/Compose; всё, что в <code>res/</code>, — классические ресурсы Android (их очень мало, потому что Compose заменяет большую часть того, что раньше делали XML-макеты).</p>
+      <div class="tree">ComposeTutorial/
+├── settings.gradle.kts                  (подключает резолвер тулчейнов Foojay)
+├── build.gradle.kts                     (уровень проекта)
+├── gradle.properties
+├── local.properties                     (зависит от машины — не коммитить в git)
+├── gradle/
+│   ├── libs.versions.toml               (каталог версий)
+│   ├── gradle-daemon-jvm.properties      (фиксирует JDK для демона)
+│   └── wrapper/gradle-wrapper.properties
+└── app/
+    ├── build.gradle.kts                 (уровень модуля)
+    ├── proguard-rules.pro
+    └── src/main/
+        ├── AndroidManifest.xml
+        ├── res/
+        │   ├── values/
+        │   │   ├── strings.xml
+        │   │   └── styles.xml           (только минимальная тема запуска)
+        │   ├── drawable/
+        │   │   ├── ic_launcher_background.xml
+        │   │   └── ic_launcher_foreground.xml
+        │   └── mipmap-anydpi-v26/
+        │       ├── ic_launcher.xml
+        │       └── ic_launcher_round.xml
+        └── java/com/example/composetutorial/
+            ├── MainActivity.kt
+            ├── ui/theme/
+            │   ├── Color.kt
+            │   ├── Type.kt
+            │   └── Theme.kt
+            └── components/
+                ├── GreetingCard.kt
+                ├── CounterButton.kt
+                ├── ProfileForm.kt
+                └── TaskList.kt</div>
+    </section>
+
+    <hr class="divider">
+
+    <section id="version-catalog">
+      <h2><code>gradle/libs.versions.toml</code></h2>
+      <span class="file-path">/gradle/libs.versions.toml</span>
+      <p>Это <strong>каталог версий</strong> Gradle — единый TOML-файл, который централизует все версии плагинов и зависимостей, используемых где-либо в проекте. Вместо того чтобы номер версии был жёстко прописан на случайной строке в <code>build.gradle.kts</code> какого-то модуля, он объявляется один раз здесь и везде далее упоминается по имени. В нём три таблицы:</p>
+      <pre><code>[versions]
+agp = "9.4.1"
+kotlin = "2.4.20"
+composeBom = "2026.09.00"
+# ...
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+# ...
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }</code></pre>
+      <ul>
+        <li><strong><code>[versions]</code></strong> — каждая «сырая» строка версии, названная один раз.</li>
+        <li><strong><code>[libraries]</code></strong> — Maven-координаты каждой зависимости (<code>group</code> + <code>name</code>), ссылающиеся на версию выше через <code>version.ref</code>. Обратите внимание: библиотеки Compose под BOM (<code>androidx-material3</code>, <code>androidx-ui</code>, …) вообще не объявляют версию — её по-прежнему подставляет BOM во время сборки.</li>
+        <li><strong><code>[plugins]</code></strong> — та же идея для плагинов Gradle.</li>
+      </ul>
+      <p>Поскольку файл лежит в <code>gradle/libs.versions.toml</code>, Gradle автоматически его обнаруживает и генерирует типобезопасный аксессор <code>libs</code>, который можно использовать напрямую в любом <code>build.gradle.kts</code> — <code>libs.androidx.material3</code>, <code>libs.plugins.kotlin.android</code> и так далее, с автодополнением в Android Studio.</p>
+      <div class="callout"><strong>Зачем это нужно?</strong> В проекте с более чем одним модулем каждый модуль раньше повторял (и мог разойтись по) свои номера версий. С каталогом обновление Kotlin или Compose BOM — это <em>изменение одной строки</em> в этом файле, которое подхватывают все модули.</div>
+    </section>
+
+    <section id="gradle-root">
+      <h2>Корневой <code>build.gradle.kts</code></h2>
+      <span class="file-path">/build.gradle.kts</span>
+      <p>Верхнеуровневый файл Gradle. Он сам ничего не собирает — он лишь объявляет с <code>apply false</code>, какие плагины доступны подмодулям, чтобы каждый модуль в многомодульном проекте оставался на одной версии. Каждый плагин берётся из каталога версий через <code>alias(libs.plugins.…)</code>, а не через жёстко прописанную пару id/версия:</p>
+      <pre><code>plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+    
+}</code></pre>
+      <p>Здесь важны три плагина: <strong>Android Gradle Plugin</strong> (умеет собирать APK), <strong>плагин Kotlin Android</strong> (компилирует Kotlin под Android) и <strong>плагин Compose Compiler</strong> — отдельный плагин компилятора Kotlin, который превращает ваши <code>@Composable</code>-функции в код, который Compose действительно может выполнять и эффективно рекомпоновать.</p>
+    </section>
+
+    <section id="gradle-app">
+      <h2><code>app/build.gradle.kts</code></h2>
+      <span class="file-path">/app/build.gradle.kts</span>
+      <p>Здесь настраивается сам модуль приложения: версии SDK, поведение сборки и все библиотечные зависимости.</p>
+      <h3>Блок <code>android { }</code></h3>
+      <table>
+        <tr><th>Настройка</th><th>Значение</th></tr>
+        <tr><td><code>compileSdk</code></td><td>Версия Android API, под которую компилируется ваш код (даёт доступ к новейшим API). Должна быть ≤ максимального уровня API, поддерживаемого вашей версией AGP.</td></tr>
+        <tr><td><code>minSdk</code></td><td>Самая старая версия Android, на которую установится приложение.</td></tr>
+        <tr><td><code>targetSdk</code></td><td>Уровень API, под который тестируется приложение; влияет на некоторое поведение во время выполнения. Ничего страшного, если он отстаёт от <code>compileSdk</code>, пока вы проверяете изменения в поведении новых версий.</td></tr>
+        <tr><td><code>testInstrumentationRunner</code></td><td>JUnit-раннер для тестов на устройстве (<code>androidTest</code>).</td></tr>
+        <tr><td><code>vectorDrawables.useSupportLibrary</code></td><td>Позволяет векторным drawable (например, фигурам иконки приложения) отрисовываться на версиях API старше нативной поддержки векторов.</td></tr>
+        <tr><td><code>proguardFiles(...)</code> в <code>buildTypes.release</code></td><td>Указывает шринкеру/обфускатору R8 на стандартные правила Android плюс собственный <code>proguard-rules.pro</code> проекта. Имеет значение только когда включён <code>isMinifyEnabled</code>.</td></tr>
+        <tr><td><code>packaging { resources { excludes += … } }</code></td><td>Удаляет дублирующиеся файлы лицензий, которые поставляют некоторые библиотеки и которые иначе ломали бы сборку конфликтом упаковки «more than one file».</td></tr>
+        <tr><td><code>buildFeatures { compose = true }</code></td><td>Включает поддержку Compose для этого модуля.</td></tr>
+      </table>
+
+      <h3>Плагины и зависимости через каталог версий</h3>
+      <p>Вместо того чтобы вручную писать id плагинов или Maven-координаты, этот файл берёт всё из <a href="#version-catalog"><code>gradle/libs.versions.toml</code></a> через сгенерированный аксессор <code>libs</code>:</p>
+      <pre><code>plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
+}
+
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.material3)
+    // ...
+}</code></pre>
+      <div class="callout">
+        <strong>Частая ошибка: отсутствующий плагин ломает сборку.</strong> Все три плагина выше должны быть подключены вместе. Если <code>alias(libs.plugins.kotlin.android)</code> пропущен, у Gradle вообще нет настройки компиляции Kotlin для модуля — а плагин компилятора Compose, которому нужен уже подключённый плагин Kotlin Android, не сможет настроиться. Симптом — обычно ошибка синхронизации Gradle с упоминанием отсутствующего расширения <code>kotlin</code> или неудачи подключения плагина компилятора Compose. Если видите такое, в первую очередь проверьте этот блок <code>plugins { }</code>.
+      </div>
+      <h3>Опции компилятора Kotlin: современное расширение <code>kotlin { }</code></h3>
+      <p>Старый способ задать целевую JVM — блок <code>kotlinOptions { jvmTarget = "…" }</code>, вложенный в <code>android { }</code>. Этот API устарел; текущий подход настраивает отдельное расширение <code>kotlin { }</code> (доступное после подключения плагина Kotlin Android):</p>
+      <pre><code>kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
+}</code></pre>
+      <p>Держите это в соответствии с <code>compileOptions { sourceCompatibility / targetCompatibility }</code> внутри <code>android { }</code> — оба должны указывать на одну и ту же версию Java.</p>
+      <h3>Compose BOM</h3>
+      <p>Compose поставляется как десятки отдельных библиотек (<code>ui</code>, <code>material3</code>, <code>foundation</code>, анимация и т. д.), которые все должны быть совместимы по версиям друг с другом. Вместо того чтобы прописывать версию в каждой строке, вы импортируете одну платформенную зависимость <strong>Bill of Materials (BOM)</strong> — саму по себе разрешаемую из каталога — и каждая другая строка <code>implementation(...)</code> Compose ниже неё автоматически разрешается в согласованную, протестированную версию:</p>
+      <pre><code>val composeBom = platform(libs.androidx.compose.bom)
+implementation(composeBom)
+androidTestImplementation(composeBom)
+
+implementation(libs.androidx.ui)
+implementation(libs.androidx.material3)</code></pre>
+      <div class="callout">Обратите внимание: ни <code>libs.androidx.ui</code>, ни <code>libs.androidx.material3</code> не несут собственной версии в каталоге — её подставляет BOM во время сборки.</div>
+      <div class="callout">
+        <strong>Частая ошибка: объявление BOM дважды.</strong> Легко получить вторую лишнюю строку ниже в блоке <code>dependencies { }</code> — например, <code>implementation(platform(libs.androidx.compose.bom))</code>, повторённую после строки <code>val composeBom = …</code> выше. Это не фатально (Gradle просто объединяет дублирующее ограничение), но это лишний груз и признак того, что файл нужно почистить. BOM следует один раз присвоить <code>val</code> и применить к каждой конфигурации (<code>implementation</code>, <code>androidTestImplementation</code>, …), которой он нужен — и никогда не вставлять второй раз инлайном.
+      </div>
+    </section>
+
+    <section id="settings">
+      <h2><code>settings.gradle.kts</code></h2>
+      <span class="file-path">/settings.gradle.kts</span>
+      <p>Объявляет имя всего проекта и то, какие модули в него входят (здесь только <code>:app</code>), а также то, из каких репозиториев Gradle разрешено скачивать зависимости и плагины (Google и Maven Central).</p>
+      <pre><code>plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}</code></pre>
+      <p>Плагин <strong>Foojay Toolchains Resolver</strong> позволяет Gradle автоматически скачать подходящий JDK, если запрошенный в <code>gradle/gradle-daemon-jvm.properties</code> (см. ниже) ещё не установлен на вашей машине, вместо того чтобы падать со сборкой и просить установить его вручную.</p>
+    </section>
+
+    <section id="daemon-jvm">
+      <h2><code>gradle/gradle-daemon-jvm.properties</code></h2>
+      <span class="file-path">/gradle/gradle-daemon-jvm.properties</span>
+      <p>Сгенерированный задачей Gradle <code>updateDaemonJvm</code>, этот файл фиксирует точный JDK (<code>toolchainVersion=21</code>, вендор <code>JETBRAINS</code>), на котором работает сам демон Gradle, с URL для скачивания под каждую ОС/архитектуру. Он держит всех в команде — и CI — на идентичном JDK, автоматически разрешаемом через плагин Foojay выше, а не на том JDK, который случайно оказался в <code>PATH</code> каждой машины.</p>
+    </section>
+
+    <section id="local-properties">
+      <h2><code>local.properties</code></h2>
+      <span class="file-path">/local.properties</span>
+      <p>Хранит конфигурацию, зависящую от машины — прежде всего <code>sdk.dir</code>, путь к вашей локальной установке Android SDK, который Android Studio записывает автоматически при первом открытии проекта.</p>
+      <div class="callout">
+        <strong>Этот файл никогда не должен попадать в систему контроля версий.</strong> Путь к SDK специфичен для одной машины (<code>sdk.dir=D:\AndroidSDK</code> ничего не значит на Mac или Linux коллеги либо на CI) — именно поэтому стандартный шаблон Android <code>.gitignore</code> его исключает. Если вы обнаружите <code>local.properties</code> закоммиченным в репозиторий, добавьте его в <code>.gitignore</code> и удалите из системы контроля версий; оставленный там файл может перезаписать путь к SDK у коллеги при следующем <code>pull</code>.
+      </div>
+    </section>
+
+    <section id="manifest">
+      <h2><code>AndroidManifest.xml</code></h2>
+      <span class="file-path">/app/src/main/AndroidManifest.xml</span>
+      <p>Даже приложению, полностью построенному на Compose, всё ещё нужен манифест — именно по нему Android узнаёт, что приложение существует, какова его точка входа и что ему разрешено делать. В этом учебнике он объявляет ровно одну <code>&lt;activity&gt;</code> — <code>MainActivity</code>, помеченную как launcher-activity через intent-фильтр <code>MAIN</code>/<code>LAUNCHER</code>, то есть экран, который открывается при нажатии пользователем на иконку приложения. Атрибуты <code>android:icon</code> и <code>android:roundIcon</code> указывают на ресурсы адаптивной иконки, описанные далее.</p>
+      <div class="callout">В полноценном приложении вы также перечислили бы здесь разрешения (камера, интернет, местоположение…) и любые дополнительные activity или сервисы. Этому учебнику ничего из этого не нужно.</div>
+    </section>
+
+    <section id="icons">
+      <h2>Ресурсы иконки приложения</h2>
+      <span class="file-path">/app/src/main/res/drawable/, /app/src/main/res/mipmap-anydpi-v26/</span>
+      <p>Четыре небольших XML-ресурса определяют иконку приложения как <strong>адаптивную иконку</strong> — формат, который Android использует с API 26, состоящий из двух отдельных векторных слоёв, которые система компонует, маскирует (в круг, «сквиркл» и т. п.) и может анимировать независимо:</p>
+      <table>
+        <tr><th>Файл</th><th>Роль</th></tr>
+        <tr><td><code>drawable/ic_launcher_background.xml</code></td><td>Векторный drawable для фонового слоя иконки (здесь — сплошной фиолетовый квадрат).</td></tr>
+        <tr><td><code>drawable/ic_launcher_foreground.xml</code></td><td>Векторный drawable для переднего слоя (здесь — простая фигура ромба).</td></tr>
+        <tr><td><code>mipmap-anydpi-v26/ic_launcher.xml</code></td><td><code>&lt;adaptive-icon&gt;</code>, ссылающийся на два drawable выше; именно в него разрешается <code>android:icon="@mipmap/ic_launcher"</code> в манифесте.</td></tr>
+        <tr><td><code>mipmap-anydpi-v26/ic_launcher_round.xml</code></td><td>Та же пара, разрешаемая для <code>android:roundIcon</code> в лаунчерах, предпочитающих круглую маску.</td></tr>
+      </table>
+      <div class="callout">
+        Квалификатор <code>-v26</code> означает, что эти ресурсы адаптивной иконки применяются только на API 26+. Поскольку <code>minSdk</code> этого проекта — 24, устройства на API 24–25 откатываются к тем ресурсам <code>ic_launcher</code>/<code>ic_launcher_round</code>, которые есть в папках под конкретные плотности (<code>mipmap-hdpi</code>, <code>mipmap-xhdpi</code>, …). Если в этом проекте таких нет, добавьте обычные PNG/WebP-заглушки для этих двух уровней API или поднимите <code>minSdk</code> до 26, если поддержка этих версий не нужна.
+      </div>
+    </section>
+
+    <section id="main-activity">
+      <h2><code>MainActivity.kt</code></h2>
+      <span class="file-path">/app/src/main/java/com/example/composetutorial/MainActivity.kt</span>
+      <p>Единственная <code>Activity</code>, содержащая весь интерфейс — распространённый шаблон в приложениях на Compose, поскольку экраны компонуются и переключаются в Kotlin, а не через запуск новых Activity.</p>
+      <pre><code>class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            ComposeTutorialTheme {
+                TutorialApp()
+            }
+        }
+    }
+}</code></pre>
+      <p><code>setContent { … }</code> — это мост между классическим миром Android Activity и Compose: всё, что внутри него, — это composable-код. Здесь нет ни XML-файла макета, ни <code>R.layout.activity_main</code>.</p>
+      <p>Ниже Activity находится <code>TutorialApp()</code> — composable, который фактически формирует макет экрана. Он оборачивает всё в <code>Scaffold</code> (структурный компонент Material, который резервирует место для верхней панели и корректно встраивает ваш контент с учётом отступов), а затем размещает четыре демонстрационных раздела — <code>GreetingCard</code>, <code>CounterButton</code>, <code>ProfileForm</code>, <code>TaskList</code> — внутри прокручиваемого <code>Column</code>.</p>
+      <pre><code>SectionLabel("4. Lists with LazyColumn")
+TaskList(
+    modifier = Modifier
+        .fillMaxWidth()
+        .height(300.dp)
+)</code></pre>
+      <div class="callout">
+        <strong>Почему <code>TaskList</code> получает явный <code>.height(300.dp)</code>.</strong> Внешний <code>Column</code> уже прокручиваемый (<code>.verticalScroll(rememberScrollState())</code>), а <code>TaskList</code> сам по себе — прокручиваемый <code>LazyColumn</code>. Если дать <code>TaskList</code> неограниченный размер — например, обернуть его в <code>Box(Modifier.fillMaxSize())</code> — это поместит один прокручиваемый контейнер с неограниченной высотой внутрь другого, что Compose не может измерить и что приводит к падению во время выполнения с <code>IllegalStateException</code>. Фиксированная (или иным образом ограниченная, например через <code>Modifier.weight()</code> в непрокручиваемом родителе) высота — это то, что делает ленивый список безопасным для вложения в прокручиваемый столбец.
+      </div>
+    </section>
+
+    <section id="theme-files">
+      <h2>Файлы <code>ui/theme/</code></h2>
+      <span class="file-path">/app/src/main/java/com/example/composetutorial/ui/theme/</span>
+      <p>Три небольших файла, которые вместе определяют визуальную идентичность приложения через систему темизации Material 3.</p>
+      <div class="grid-2">
+        <div class="card">
+          <strong>Color.kt</strong>
+          <p style="margin-bottom:0">Сырые константы <code>Color(0x…)</code> для светлой и тёмной палитры — просто значения, без логики.</p>
+        </div>
+        <div class="card">
+          <strong>Type.kt</strong>
+          <p style="margin-bottom:0">Объект <code>Typography</code>, переопределяющий несколько именованных текстовых стилей Material 3 (<code>bodyLarge</code>, <code>titleLarge</code>, <code>labelSmall</code>) размерами и насыщенностью шрифта этого приложения.</p>
+        </div>
+      </div>
+      <div class="card">
+        <strong>Theme.kt</strong>
+        <p>Определяет <code>ComposeTutorialTheme</code> — composable-обёртку, которую вы вызываете один раз в корне приложения. Она выбирает светлую или тёмную <code>ColorScheme</code> (учитывая системную настройку и даже «динамический цвет» на основе обоев на Android 12+), затем передаёт цвета и типографику в <code>MaterialTheme</code> из Compose:</p>
+        <pre><code>MaterialTheme(
+    colorScheme = colorScheme,
+    typography = AppTypography,
+    content = content
+)</code></pre>
+        <p style="margin-bottom:0">Теперь каждый composable внутри <code>content</code> может читать <code>MaterialTheme.colorScheme.primary</code>, <code>MaterialTheme.typography.bodyLarge</code> и т. д. вместо жёстко прописанных цветов и шрифтов.</p>
+      </div>
+    </section>
+
+    <section id="components">
+      <h2>Файлы <code>components/</code></h2>
+      <span class="file-path">/app/src/main/java/com/example/composetutorial/components/</span>
+      <p>Четыре небольших, сфокусированных composable, каждый демонстрирует одну ключевую идею Compose. <code>MainActivity.kt</code> собирает все четыре в один экран.</p>
+
+      <h3>GreetingCard.kt</h3>
+      <p><strong>Идея: composable без состояния (stateless).</strong> Он принимает параметр <code>name</code> и выдаёт Material <code>Card</code> с двумя строками текста — и ничего больше. Он не владеет состоянием и не имеет побочных эффектов, что делает его тривиально переиспользуемым и удобным для превью с разными входными данными.</p>
+
+      <h3>CounterButton.kt</h3>
+      <p><strong>Идея: состояние и рекомпозиция.</strong> Хранит счётчик через <code>remember { mutableIntStateOf(0) }</code>. Нажатие кнопки увеличивает его; поскольку composable <em>читает</em> это состояние, Compose автоматически перезапускает (рекомпонует) только этот небольшой фрагмент интерфейса при каждом его изменении.</p>
+
+      <h3>ProfileForm.kt</h3>
+      <p><strong>Идея: поднятие состояния (state hoisting).</strong> Текстовое поле, текущее значение которого хранится в <code>remember { mutableStateOf("") }</code> вне самого <code>OutlinedTextField</code>, а затем передаётся обратно через <code>value</code> / <code>onValueChange</code>. Текстовое поле не управляет своим состоянием — это делает вызывающий код — что является стандартным, тестируемым шаблоном для интерактивного интерфейса на Compose.</p>
+
+      <h3>TaskList.kt</h3>
+      <p><strong>Идея: эффективные списки.</strong> Использует <code>LazyColumn</code> (аналог <code>RecyclerView</code> в Compose) на основе <code>mutableStateListOf</code> из небольшого data-класса <code>Task</code>, поэтому компонуются только элементы, видимые на экране в данный момент, а переключение чекбокса обновляет только эту строку.</p>
+    </section>
+
+    <hr class="divider">
+
+    <section id="what-is-compose">
+      <h2>Что такое Jetpack Compose</h2>
+      <p>Jetpack Compose — это современный UI-инструментарий Google для Android, полностью написанный на Kotlin. Он заменяет старую систему View (XML-макеты + связующий код <code>Activity</code>/<code>Fragment</code>) <strong>декларативной</strong> моделью, заимствованной у таких фреймворков, как React и Flutter:</p>
+      <table>
+        <tr><th></th><th>Классические View (императивно)</th><th>Compose (декларативно)</th></tr>
+        <tr><td>Как вы строите UI</td><td>XML-файлы макетов + код на Kotlin/Java, который мутирует view</td><td>Функции Kotlin, описывающие UI для текущего состояния</td></tr>
+        <tr><td>Обновление UI</td><td>Вы вручную вызываете <code>setText()</code>, <code>setVisibility()</code> и т. д.</td><td>Вы меняете состояние; Compose автоматически перезапускает нужные функции</td></tr>
+        <tr><td>Переиспользование</td><td>Подклассы View, <code>&lt;include&gt;</code></td><td>Обычные функции Kotlin</td></tr>
+      </table>
+      <p>Поскольку UI — это просто функция от состояния, большинство ошибок в Compose сводятся к гораздо более простой и знакомой проблеме: «правильно ли моё состояние?» — вместо «не забыл ли я обновить вот это конкретное view?».</p>
+    </section>
+
+    <section id="composable-functions">
+      <h2>Composable-функции</h2>
+      <p><strong>Composable-функция</strong> — это любая функция, помеченная аннотацией <code>@Composable</code>. Она описывает фрагмент UI, вызывая другие composable:</p>
+      <pre><code>@Composable
+fun GreetingCard(name: String, modifier: Modifier = Modifier) {
+    Card(modifier = modifier) {
+        Text("Hello, $name")
+    }
+}</code></pre>
+      <ul>
+        <li>Composable-функции можно вызывать только из других composable-функций (или из точки входа вроде <code>setContent { }</code>).</li>
+        <li>Они могут выполняться <strong>в любом порядке</strong>, <strong>параллельно</strong> и <strong>более одного раза</strong> — поэтому им следует избегать побочных эффектов и просто описывать UI исходя из своих входных данных.</li>
+        <li>По соглашению они принимают завершающий параметр <code>modifier: Modifier = Modifier</code> (см. <a href="#modifiers">Модификаторы</a>), чтобы вызывающий код управлял макетом.</li>
+      </ul>
+    </section>
+
+    <section id="state">
+      <h2>Состояние и рекомпозиция</h2>
+      <p><strong>Рекомпозиция</strong> — это процесс повторного выполнения composable-функций при изменении состояния, которое они читают, чтобы UI на экране оставался синхронизированным с состоянием приложения. Ключевой строительный блок — <code>mutableStateOf</code>:</p>
+      <pre><code>var count by remember { mutableIntStateOf(0) }
+
+Button(onClick = { count++ }) { Text("Tap me") }
+Text("Clicked $count times")   // перезапускается при каждом изменении count</code></pre>
+      <ul>
+        <li><code>mutableStateOf</code> (и специализированные <code>mutableIntStateOf</code>, <code>mutableStateListOf</code> и т. д.) создаёт <strong>наблюдаемое</strong> состояние — Compose отслеживает каждый composable, который его читает.</li>
+        <li><code>remember { … }</code> кэширует это состояние между рекомпозициями <em>одного и того же</em> экземпляра composable — без него состояние сбрасывалось бы к начальному значению при каждом повторном запуске функции.</li>
+        <li><code>remember</code> <strong>не</strong> переживает изменения конфигурации (например, поворот экрана) или смерть процесса — для этого нужно использовать <code>rememberSaveable</code>.</li>
+      </ul>
+      <div class="callout"><strong>Умная рекомпозиция:</strong> Compose перезапускает только те composable, которые фактически читают изменённое состояние, а не весь экран — именно поэтому интерфейс остаётся быстрым даже в больших приложениях.</div>
+    </section>
+
+    <section id="modifiers">
+      <h2>Модификаторы</h2>
+      <p><code>Modifier</code> — это цепочка инструкций, которые украшают или настраивают то, как composable измеряется, размещается, отрисовывается или реагирует на ввод — отступы, размер, обработка нажатий, цвет фона и многое другое:</p>
+      <pre><code>Text(
+    text = "Hello",
+    modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)
+        .background(Color.LightGray)
+        .clickable { /* ... */ }
+)</code></pre>
+      <p><strong>Порядок важен</strong> — каждый модификатор оборачивает результат предыдущего, поэтому <code>padding().background()</code> рисует фон <em>снаружи</em> отступа, а <code>background().padding()</code> — <em>внутри</em>. Именно поэтому каждый layout-компонент в этом проекте принимает необязательный параметр <code>modifier</code>: это позволяет родителю управлять отступами и размерами, не требуя от дочернего элемента знания о его контексте.</p>
+    </section>
+
+    <section id="layouts">
+      <h2>Макеты: Column, Row, Box</h2>
+      <p>В Compose есть три фундаментальных layout-компонента, примерно соответствующих LinearLayout и FrameLayout в старой системе View:</p>
+      <table>
+        <tr><th>Composable</th><th>Располагает дочерние элементы…</th></tr>
+        <tr><td><code>Column</code></td><td>вертикально, сверху вниз</td></tr>
+        <tr><td><code>Row</code></td><td>горизонтально, слева направо</td></tr>
+        <tr><td><code>Box</code></td><td>друг на друге (для наложений, бейджей и т. п.)</td></tr>
+      </table>
+      <p>Все три принимают параметры <code>Arrangement</code> (расстояние между дочерними элементами) и <code>Alignment</code> (выравнивание дочерних элементов по поперечной оси). <code>MainActivity.kt</code> использует <code>Column</code> с <code>Arrangement.spacedBy(4.dp)</code> для размещения разделов учебника, а строка в <code>TaskList.kt</code> использует <code>Alignment.CenterVertically</code> для выравнивания чекбокса с его подписью.</p>
+    </section>
+
+    <section id="lists">
+      <h2>Списки: LazyColumn</h2>
+      <p>Для списков, которые могут быть длинными или неограниченными, используйте <code>LazyColumn</code> (или <code>LazyRow</code>) вместо <code>Column</code> с циклом. «Lazy» означает, что он компонует и измеряет только те элементы, которые фактически видны на экране, переиспользуя composable по мере прокрутки пользователем — прямой аналог <code>RecyclerView</code>.</p>
+      <pre><code>LazyColumn {
+    items(tasks) { task ->
+        TaskRow(task = task, onToggle = { /* ... */ })
+    }
+}</code></pre>
+      <div class="callout">Использование обычного <code>Column</code> для большого или растущего списка компонует все элементы заранее, что тратит память и процессор. <code>LazyColumn</code> — правильный выбор по умолчанию, когда размер списка не мал и не фиксирован.</div>
+    </section>
+
+    <section id="material3">
+      <h2>Компоненты Material 3</h2>
+      <p>Библиотека <code>androidx.compose.material3</code> предоставляет готовые, учитывающие тему UI-компоненты, реализующие спецификацию Google Material Design 3. В этом проекте используются:</p>
+      <table>
+        <tr><th>Компонент</th><th>Для чего</th></tr>
+        <tr><td><code>Scaffold</code></td><td>Структура экрана верхнего уровня (верхняя панель, отступы контента)</td></tr>
+        <tr><td><code>TopAppBar</code></td><td>Панель заголовка в верхней части экрана</td></tr>
+        <tr><td><code>Card</code></td><td>Приподнятая поверхность для сгруппированного контента</td></tr>
+        <tr><td><code>Button</code></td><td>Кликабельный, залитый призыв к действию</td></tr>
+        <tr><td><code>OutlinedTextField</code></td><td>Однострочный ввод текста</td></tr>
+        <tr><td><code>Checkbox</code></td><td>Логический переключатель внутри каждой строки задачи</td></tr>
+      </table>
+      <p>Каждый из них автоматически подхватывает цвета из <code>MaterialTheme.colorScheme</code> и текстовые стили из <code>MaterialTheme.typography</code> — именно это и настраивает <a href="#theme-files">Theme.kt</a>.</p>
+    </section>
+
+    <section id="theming">
+      <h2>Темизация</h2>
+      <p>Темизация в Compose течёт в одном направлении: вы задаёте её один раз, near the root (<code>ComposeTutorialTheme { … }</code> в <code>MainActivity</code>), и каждый composable ниже читает из неё через <code>MaterialTheme.colorScheme</code> / <code>MaterialTheme.typography</code> / <code>MaterialTheme.shapes</code>. Именно поэтому ни один из четырёх файлов компонентов не прописывает жёстко ни одного цвета или шрифта — все они полагаются на тему, так что переключение на тёмный режим или изменение стиля всего приложения означает редактирование <code>Theme.kt</code> и <code>Color.kt</code> в одном месте, а не поиск по каждому экрану.</p>
+    </section>
+
+    <section id="previews">
+      <h2>Превью</h2>
+      <p>Любой composable, помеченный <code>@Preview</code>, может быть отрисован панелью Design в Android Studio <strong>без сборки и запуска приложения</strong> — без эмулятора, без устройства, часто менее чем за секунду. Каждый файл в <code>components/</code> заканчивается таким превью:</p>
+      <pre><code>@Preview(showBackground = true)
+@Composable
+private fun GreetingCardPreview() {
+    ComposeTutorialTheme {
+        GreetingCard(name = "Jetpack Compose")
+    }
+}</code></pre>
+      <p>Оборачивание превью в тему приложения (как показано выше) гарантирует, что оно будет выглядеть точно так же, как во время выполнения. Вы можете наложить несколько аннотаций <code>@Preview</code> на одну функцию, чтобы увидеть её в светлом/тёмном режиме, с разным масштабом шрифта или разными размерами устройств рядом.</p>
+    </section>
+
+    <hr class="divider">
+
+    <section id="exercises">
+      <h2>Попробуйте сами</h2>
+      <ol>
+        <li>Добавьте пятый раздел в <code>TutorialApp()</code>, используя новый composable, написанный вами с нуля — начните с чего-нибудь без состояния, как <code>GreetingCard</code>.</li>
+        <li>Добавьте в <code>CounterButton</code> кнопку «Reset», которая сбрасывает <code>count</code> обратно в <code>0</code>.</li>
+        <li>Добавьте иконку удаления в каждую <code>TaskRow</code> в <code>TaskList.kt</code>, которая удаляет её из <code>mutableStateListOf</code>.</li>
+        <li>Измените <code>PurpleLight</code> в <code>Color.kt</code> на другой оттенок и наблюдайте, как обновляются все тематические компоненты.</li>
+        <li>Добавьте второе <code>@Preview(uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)</code> к компоненту, чтобы увидеть его превью в тёмном режиме.</li>
+      </ol>
+    </section>
+
+    <section id="resources">
+      <h2>Дополнительные ресурсы</h2>
+      <ul>
+        <li><a href="https://developer.android.com/jetpack/compose" target="_blank" rel="noopener">Официальная документация Jetpack Compose</a></li>
+        <li><a href="https://developer.android.com/jetpack/compose/mental-model" target="_blank" rel="noopener">Декларативная ментальная модель Compose</a></li>
+        <li><a href="https://developer.android.com/jetpack/compose/state" target="_blank" rel="noopener">Состояние и Jetpack Compose</a></li>
+        <li><a href="https://m3.material.io/" target="_blank" rel="noopener">Material Design 3</a></li>
+      </ul>
+      <footer>
+        <p><a class="top-link" href="#intro">↑ Наверх</a></p>
+      </footer>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Подсвечивает активную ссылку раздела при прокрутке.
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#sidebar a'));
+    var sections = links
+      .map(function (l) { return document.querySelector(l.getAttribute('href')); })
+      .filter(Boolean);
+
+    function onScroll() {
+      var scrollPos = window.scrollY + 100;
+      var current = sections[0];
+      for (var i = 0; i < sections.length; i++) {
+        if (sections[i].offsetTop <= scrollPos) current = sections[i];
+      }
+      links.forEach(function (l) {
+        l.classList.toggle('active', l.getAttribute('href') === '#' + current.id);
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+</script>
+</body>
+</html>

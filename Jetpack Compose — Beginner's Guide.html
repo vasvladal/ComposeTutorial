@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jetpack Compose — Beginner's Guide</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-alt: #f6f5f9;
+    --text: #1c1b1f;
+    --text-muted: #625b71;
+    --border: #e4e1ea;
+    --accent: #6650a4;
+    --accent-soft: #eee8fb;
+    --code-bg: #1e1b2e;
+    --code-text: #e9e4f5;
+    --nav-width: 280px;
+    --radius: 10px;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg: #141218;
+      --bg-alt: #1d1b22;
+      --text: #e6e1e9;
+      --text-muted: #cac4d0;
+      --border: #322f38;
+      --accent: #d0bcff;
+      --accent-soft: #322a45;
+      --code-bg: #0f0d16;
+      --code-text: #e9e4f5;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141218;
+    --bg-alt: #1d1b22;
+    --text: #e6e1e9;
+    --text-muted: #cac4d0;
+    --border: #322f38;
+    --accent: #d0bcff;
+    --accent-soft: #322a45;
+    --code-bg: #0f0d16;
+    --code-text: #e9e4f5;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: calc(24px + env(safe-area-inset-top, 0px)); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  a { color: var(--accent); }
+
+  /* Layout */
+  .app {
+    display: flex;
+    min-height: 100vh;
+  }
+  nav#sidebar {
+    width: var(--nav-width);
+    flex-shrink: 0;
+    background: var(--bg-alt);
+    border-right: 1px solid var(--border);
+    padding: env(safe-area-inset-top, 0px) 0 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .brand {
+    padding: 22px 22px 16px 22px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .brand .kicker {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: 0 0 4px 0;
+  }
+  .brand h1 {
+    font-size: 18px;
+    margin: 0;
+    line-height: 1.3;
+  }
+  nav#sidebar .group-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 16px 22px 6px 22px;
+  }
+  nav#sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  nav#sidebar a {
+    display: block;
+    padding: 8px 22px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14.5px;
+    border-left: 3px solid transparent;
+  }
+  nav#sidebar a:hover {
+    background: var(--accent-soft);
+  }
+  nav#sidebar a.active {
+    border-left-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  main {
+    flex: 1;
+    min-width: 0;
+    max-width: 880px;
+    padding: 40px 48px 80px 48px;
+  }
+  @media (max-width: 900px) {
+    .app { display: block; }
+    nav#sidebar {
+      position: static;
+      width: 100%;
+      height: auto;
+      top: auto;
+    }
+    main { padding: 28px 20px 60px 20px; max-width: 100%; }
+  }
+
+  section { margin-bottom: 56px; scroll-margin-top: 20px; }
+  section:first-of-type { margin-top: 0; }
+  h1 { font-size: 30px; margin: 0 0 10px 0; }
+  h2 {
+    font-size: 24px;
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 18px; margin: 28px 0 10px 0; color: var(--accent); }
+  p { color: var(--text); }
+  .lede { color: var(--text-muted); font-size: 16px; }
+
+  code {
+    background: var(--accent-soft);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.9em;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px 18px;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .card {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .file-path {
+    display: inline-block;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 13px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .tree {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px 18px;
+    border-radius: var(--radius);
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th { color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 12px 16px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 16px 0;
+    font-size: 14.5px;
+  }
+  .callout strong { color: var(--accent); }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 700px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .top-link { font-size: 13px; }
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  footer {
+    color: var(--text-muted);
+    font-size: 13px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <nav id="sidebar">
+    <div class="brand">
+      <p class="kicker">Beginner's Guide</p>
+      <h1>Jetpack Compose Tutorial</h1>
+    </div>
+
+    <p class="group-title">Getting started</p>
+    <ul>
+      <li><a href="#intro">Introduction</a></li>
+      <li><a href="#setup">Opening the project</a></li>
+      <li><a href="#structure">Project structure</a></li>
+    </ul>
+
+    <p class="group-title">Project files</p>
+    <ul>
+      <li><a href="#version-catalog">gradle/libs.versions.toml</a></li>
+      <li><a href="#gradle-root">Root build.gradle.kts</a></li>
+      <li><a href="#gradle-app">app/build.gradle.kts</a></li>
+      <li><a href="#settings">settings.gradle.kts</a></li>
+      <li><a href="#daemon-jvm">gradle-daemon-jvm.properties</a></li>
+      <li><a href="#local-properties">local.properties</a></li>
+      <li><a href="#manifest">AndroidManifest.xml</a></li>
+      <li><a href="#icons">Launcher icon resources</a></li>
+      <li><a href="#main-activity">MainActivity.kt</a></li>
+      <li><a href="#theme-files">ui/theme files</a></li>
+      <li><a href="#components">components/ files</a></li>
+    </ul>
+
+    <p class="group-title">Jetpack Compose framework</p>
+    <ul>
+      <li><a href="#what-is-compose">What Compose is</a></li>
+      <li><a href="#composable-functions">Composable functions</a></li>
+      <li><a href="#state">State &amp; recomposition</a></li>
+      <li><a href="#modifiers">Modifiers</a></li>
+      <li><a href="#layouts">Layouts</a></li>
+      <li><a href="#lists">Lists: LazyColumn</a></li>
+      <li><a href="#material3">Material 3 components</a></li>
+      <li><a href="#theming">Theming</a></li>
+      <li><a href="#previews">Previews</a></li>
+    </ul>
+
+    <p class="group-title">Where to go next</p>
+    <ul>
+      <li><a href="#exercises">Try it yourself</a></li>
+      <li><a href="#resources">Further resources</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <section id="intro">
+      <h1>Jetpack Compose — Beginner's Guide</h1>
+      <p class="lede">A walkthrough of the <code>ComposeTutorial</code> Android Studio project: what every file does, and how the Jetpack Compose framework underneath it actually works.</p>
+      <div class="callout">
+        <strong>Who this is for</strong> — you know some Kotlin, you've opened Android Studio before, and you want to understand Compose from first principles rather than copy-pasting snippets.
+      </div>
+      <p>Jetpack Compose is Android's modern, <strong>declarative</strong> UI toolkit. Instead of imperatively mutating XML views (<code>findViewById</code>, <code>view.text = "..."</code>), you describe <em>what</em> the UI should look like for a given state, and Compose figures out <em>how</em> to update the screen when that state changes.</p>
+    </section>
+
+    <section id="setup">
+      <h2>Opening the project</h2>
+      <ol>
+        <li>Install <strong>Android Studio</strong> (a recent stable release) if you haven't already.</li>
+        <li><code>File → Open…</code> and select the unzipped <code>ComposeTutorial</code> folder.</li>
+        <li>Wait for the Gradle sync to finish — Android Studio downloads the dependencies listed in the Gradle files (covered below).</li>
+        <li>Select the <code>app</code> run configuration and press <strong>Run</strong> on an emulator or a connected device (minimum Android 7.0 / API 24).</li>
+      </ol>
+      <div class="callout">No emulator handy? Every screen in this project also has a <code>@Preview</code>, so you can inspect and iterate on the UI directly in Android Studio's Design pane — see <a href="#previews">Previews</a>.</div>
+    </section>
+
+    <section id="structure">
+      <h2>Project structure</h2>
+      <p>Here's the full layout of the tutorial project. Everything under <code>app/src/main/java/…/composetutorial</code> is Kotlin/Compose code; everything under <code>res/</code> is classic Android resources (there are very few of these, because Compose replaces most of what XML layouts used to do).</p>
+      <div class="tree">ComposeTutorial/
+├── settings.gradle.kts                  (applies the Foojay toolchain resolver)
+├── build.gradle.kts                     (project-level)
+├── gradle.properties
+├── local.properties                     (machine-specific — keep out of git)
+├── gradle/
+│   ├── libs.versions.toml               (version catalog)
+│   ├── gradle-daemon-jvm.properties      (pins the daemon's JDK)
+│   └── wrapper/gradle-wrapper.properties
+└── app/
+    ├── build.gradle.kts                 (module-level)
+    ├── proguard-rules.pro
+    └── src/main/
+        ├── AndroidManifest.xml
+        ├── res/
+        │   ├── values/
+        │   │   ├── strings.xml
+        │   │   └── styles.xml           (minimal launch theme only)
+        │   ├── drawable/
+        │   │   ├── ic_launcher_background.xml
+        │   │   └── ic_launcher_foreground.xml
+        │   └── mipmap-anydpi-v26/
+        │       ├── ic_launcher.xml
+        │       └── ic_launcher_round.xml
+        └── java/com/example/composetutorial/
+            ├── MainActivity.kt
+            ├── ui/theme/
+            │   ├── Color.kt
+            │   ├── Type.kt
+            │   └── Theme.kt
+            └── components/
+                ├── GreetingCard.kt
+                ├── CounterButton.kt
+                ├── ProfileForm.kt
+                └── TaskList.kt</div>
+    </section>
+
+    <hr class="divider">
+
+    <section id="version-catalog">
+      <h2><code>gradle/libs.versions.toml</code></h2>
+      <span class="file-path">/gradle/libs.versions.toml</span>
+      <p>This is Gradle's <strong>version catalog</strong> — a single TOML file that centralizes every plugin and dependency version used anywhere in the project. Instead of a version number being hardcoded on some random line of a module's <code>build.gradle.kts</code>, it's declared once here and referenced everywhere else by name. It has three tables:</p>
+      <pre><code>[versions]
+agp = "9.4.1"
+kotlin = "2.4.20"
+composeBom = "2026.09.00"
+# ...
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+# ...
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }</code></pre>
+      <ul>
+        <li><strong><code>[versions]</code></strong> — every raw version string, named once.</li>
+        <li><strong><code>[libraries]</code></strong> — each dependency's Maven coordinates (<code>group</code> + <code>name</code>), pointing at a version above via <code>version.ref</code>. Notice the Compose libraries below the BOM (<code>androidx-material3</code>, <code>androidx-ui</code>, …) don't declare a version at all — the BOM still supplies it at build time.</li>
+        <li><strong><code>[plugins]</code></strong> — the same idea for Gradle plugins.</li>
+      </ul>
+      <p>Because the file lives at <code>gradle/libs.versions.toml</code>, Gradle auto-detects it and generates a type-safe <code>libs</code> accessor you can use directly in any <code>build.gradle.kts</code> — <code>libs.androidx.material3</code>, <code>libs.plugins.kotlin.android</code>, and so on, with autocomplete in Android Studio.</p>
+      <div class="callout"><strong>Why bother?</strong> In a project with more than one module, every module used to repeat (and could drift on) its own version numbers. With a catalog, bumping Kotlin or the Compose BOM is a <em>one-line change</em> in this file that every module picks up.</div>
+    </section>
+
+    <section id="gradle-root">
+      <h2>Root <code>build.gradle.kts</code></h2>
+      <span class="file-path">/build.gradle.kts</span>
+      <p>The top-level Gradle file. It doesn't build anything itself — it just declares, with <code>apply false</code>, which plugins are available to sub-modules, so every module in a multi-module project stays on the same version. Each plugin is referenced from the version catalog via <code>alias(libs.plugins.…)</code> rather than a hardcoded id/version pair:</p>
+      <pre><code>plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+}</code></pre>
+      <p>Three plugins matter here: the <strong>Android Gradle Plugin</strong> (knows how to build APKs), the <strong>Kotlin Android plugin</strong> (compiles Kotlin for Android), and the <strong>Compose Compiler plugin</strong> — a separate Kotlin compiler plugin that turns your <code>@Composable</code> functions into code Compose can actually run and recompose efficiently.</p>
+    </section>
+
+    <section id="gradle-app">
+      <h2><code>app/build.gradle.kts</code></h2>
+      <span class="file-path">/app/build.gradle.kts</span>
+      <p>This is where the actual app module is configured: SDK versions, build behavior, and every library dependency.</p>
+      <h3>The <code>android { }</code> block</h3>
+      <table>
+        <tr><th>Setting</th><th>Meaning</th></tr>
+        <tr><td><code>compileSdk</code></td><td>The Android API version your code is compiled against (gives you access to the newest APIs). Must be ≤ the maximum API level your AGP version supports.</td></tr>
+        <tr><td><code>minSdk</code></td><td>The oldest Android version the app will install on.</td></tr>
+        <tr><td><code>targetSdk</code></td><td>The API level your app is tested against; affects some runtime behaviors. It's fine for this to trail <code>compileSdk</code> while you verify newer behavior changes.</td></tr>
+        <tr><td><code>testInstrumentationRunner</code></td><td>The JUnit runner used for on-device (<code>androidTest</code>) tests.</td></tr>
+        <tr><td><code>vectorDrawables.useSupportLibrary</code></td><td>Lets vector drawables (like the launcher icon's shapes) render on API levels older than native vector support.</td></tr>
+        <tr><td><code>proguardFiles(...)</code>, in <code>buildTypes.release</code></td><td>Points the R8 shrinker/obfuscator at the default Android rules plus this project's own <code>proguard-rules.pro</code>. Only matters once <code>isMinifyEnabled</code> is turned on.</td></tr>
+        <tr><td><code>packaging { resources { excludes += … } }</code></td><td>Strips duplicate license files some libraries bundle, which would otherwise fail the build with a "more than one file" packaging conflict.</td></tr>
+        <tr><td><code>buildFeatures { compose = true }</code></td><td>Turns on Compose support for this module.</td></tr>
+      </table>
+
+      <h3>Plugins &amp; dependencies via the version catalog</h3>
+      <p>Rather than writing plugin ids or Maven coordinates by hand, this file pulls everything from <a href="#version-catalog"><code>gradle/libs.versions.toml</code></a> through the generated <code>libs</code> accessor:</p>
+      <pre><code>plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+}
+
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.material3)
+    // ...
+}</code></pre>
+      <div class="callout">
+        <strong>Common mistake: a missing plugin breaks the build.</strong> All three plugins above must be applied together. If <code>alias(libs.plugins.kotlin.android)</code> is left out, Gradle has no Kotlin compilation set up for the module at all — and the Compose compiler plugin, which needs the Kotlin Android plugin already applied, fails to configure. The symptom is usually a Gradle sync error mentioning a missing <code>kotlin</code> extension or the Compose compiler plugin failing to apply. If you see that, check this <code>plugins { }</code> block first.
+      </div>
+      <h3>Kotlin compiler options: the modern <code>kotlin { }</code> extension</h3>
+      <p>The old way to set the JVM target was a <code>kotlinOptions { jvmTarget = "…" }</code> block nested inside <code>android { }</code>. That API is deprecated; the current approach configures the standalone <code>kotlin { }</code> extension (available once the Kotlin Android plugin is applied) instead:</p>
+      <pre><code>kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
+}</code></pre>
+      <p>Keep this in sync with <code>compileOptions { sourceCompatibility / targetCompatibility }</code> inside <code>android { }</code> — both should point at the same Java version.</p>
+      <h3>The Compose BOM</h3>
+      <p>Compose ships as dozens of separate libraries (<code>ui</code>, <code>material3</code>, <code>foundation</code>, animation, etc.) that all need to be version-compatible with each other. Rather than pinning a version on every single line, you import one <strong>Bill of Materials (BOM)</strong> platform dependency — itself resolved from the catalog — and every other Compose <code>implementation(...)</code> line below it automatically resolves to a matching, tested version:</p>
+      <pre><code>val composeBom = platform(libs.androidx.compose.bom)
+implementation(composeBom)
+androidTestImplementation(composeBom)
+
+implementation(libs.androidx.ui)
+implementation(libs.androidx.material3)</code></pre>
+      <div class="callout">Notice neither <code>libs.androidx.ui</code> nor <code>libs.androidx.material3</code> carries its own version in the catalog — the BOM supplies it at build time.</div>
+      <div class="callout">
+        <strong>Common mistake: declaring the BOM twice.</strong> It's easy to end up with a second, stray line further down the <code>dependencies { }</code> block — e.g. <code>implementation(platform(libs.androidx.compose.bom))</code> repeated after the <code>val composeBom = …</code> line above. It isn't fatal (Gradle just merges the duplicate constraint), but it's dead weight and a sign the file needs a cleanup pass. The BOM should be assigned to a <code>val</code> once and applied to each configuration (<code>implementation</code>, <code>androidTestImplementation</code>, …) that needs it — never inlined a second time.
+      </div>
+    </section>
+
+    <section id="settings">
+      <h2><code>settings.gradle.kts</code></h2>
+      <span class="file-path">/settings.gradle.kts</span>
+      <p>Declares the name of the whole project and which modules belong to it (here, just <code>:app</code>), plus which repositories Gradle is allowed to fetch dependencies and plugins from (Google's and Maven Central).</p>
+      <pre><code>plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}</code></pre>
+      <p>The <strong>Foojay Toolchains Resolver</strong> plugin lets Gradle automatically download a matching JDK if the one requested by <code>gradle/gradle-daemon-jvm.properties</code> (see below) isn't already installed on your machine, instead of failing the build and asking you to install one by hand.</p>
+    </section>
+
+    <section id="daemon-jvm">
+      <h2><code>gradle/gradle-daemon-jvm.properties</code></h2>
+      <span class="file-path">/gradle/gradle-daemon-jvm.properties</span>
+      <p>Generated by Gradle's <code>updateDaemonJvm</code> task, this file pins the exact JDK (<code>toolchainVersion=21</code>, vendor <code>JETBRAINS</code>) that the Gradle daemon itself runs on, with a download URL per OS/architecture. It keeps everyone on the team — and CI — building with the identical JDK, resolved automatically via the Foojay plugin above rather than whatever JDK happens to be on each machine's <code>PATH</code>.</p>
+    </section>
+
+    <section id="local-properties">
+      <h2><code>local.properties</code></h2>
+      <span class="file-path">/local.properties</span>
+      <p>Holds machine-specific configuration — most importantly <code>sdk.dir</code>, the path to your local Android SDK install, which Android Studio writes automatically the first time you open the project.</p>
+      <div class="callout">
+        <strong>This file should never be committed to version control.</strong> The SDK path is specific to one machine (<code>sdk.dir=D:\AndroidSDK</code> means nothing on a teammate's Mac or Linux box, or on CI) — that's exactly why the standard Android <code>.gitignore</code> template excludes it. If you find <code>local.properties</code> checked into your repository, add it to <code>.gitignore</code> and remove it from version control; leaving it in can overwrite a teammate's SDK path the next time they pull.
+      </div>
+    </section>
+
+    <section id="manifest">
+      <h2><code>AndroidManifest.xml</code></h2>
+      <span class="file-path">/app/src/main/AndroidManifest.xml</span>
+      <p>Even a Compose-only app still needs a manifest — it's how Android knows the app exists, what its entry point is, and what it's allowed to do. In this tutorial it declares exactly one <code>&lt;activity&gt;</code>, <code>MainActivity</code>, marked as the launcher activity via the <code>MAIN</code>/<code>LAUNCHER</code> intent filter — i.e. the screen that opens when the user taps the app icon. <code>android:icon</code> and <code>android:roundIcon</code> point at the adaptive icon resources described next.</p>
+      <div class="callout">In a full app you'd also list permissions here (camera, internet, location...) and any additional activities or services. This tutorial needs none of those.</div>
+    </section>
+
+    <section id="icons">
+      <h2>Launcher icon resources</h2>
+      <span class="file-path">/app/src/main/res/drawable/, /app/src/main/res/mipmap-anydpi-v26/</span>
+      <p>Four small XML resources define the app's launcher icon as an <strong>adaptive icon</strong> — the format Android has used since API 26, made of two separate vector layers the system composes, masks (into a circle, squircle, etc.) and can animate independently:</p>
+      <table>
+        <tr><th>File</th><th>Role</th></tr>
+        <tr><td><code>drawable/ic_launcher_background.xml</code></td><td>A vector drawable for the icon's background layer (here, a flat purple square).</td></tr>
+        <tr><td><code>drawable/ic_launcher_foreground.xml</code></td><td>A vector drawable for the foreground layer (here, a simple diamond shape).</td></tr>
+        <tr><td><code>mipmap-anydpi-v26/ic_launcher.xml</code></td><td>An <code>&lt;adaptive-icon&gt;</code> that references the two drawables above; this is what <code>android:icon="@mipmap/ic_launcher"</code> in the manifest resolves to.</td></tr>
+        <tr><td><code>mipmap-anydpi-v26/ic_launcher_round.xml</code></td><td>The same pairing, resolved for <code>android:roundIcon</code> on launchers that prefer a round mask.</td></tr>
+      </table>
+      <div class="callout">
+        The <code>-v26</code> qualifier means these adaptive-icon resources only apply on API 26+. Since this project's <code>minSdk</code> is 24, devices on API 24–25 fall back to whatever <code>ic_launcher</code>/<code>ic_launcher_round</code> resources exist in density-specific folders (<code>mipmap-hdpi</code>, <code>mipmap-xhdpi</code>, …). If this project doesn't have any, add flat PNG/WebP fallbacks for those two API levels, or raise <code>minSdk</code> to 26 if you don't need to support them.
+      </div>
+    </section>
+
+    <section id="main-activity">
+      <h2><code>MainActivity.kt</code></h2>
+      <span class="file-path">/app/src/main/java/com/example/composetutorial/MainActivity.kt</span>
+      <p>The single <code>Activity</code> that hosts the entire UI — a common pattern in Compose apps, since screens are composed and swapped in Kotlin rather than by launching new Activities.</p>
+      <pre><code>class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            ComposeTutorialTheme {
+                TutorialApp()
+            }
+        }
+    }
+}</code></pre>
+      <p><code>setContent { … }</code> is the bridge between the classic Android Activity world and Compose: everything inside it is composable code. There's no XML layout file and no <code>R.layout.activity_main</code> anywhere.</p>
+      <p>Below the Activity, <code>TutorialApp()</code> is the composable that actually lays out the screen. It wraps everything in a <code>Scaffold</code> (a Material structural component that reserves space for a top bar, and correctly insets your content around it), then stacks the four demo sections — <code>GreetingCard</code>, <code>CounterButton</code>, <code>ProfileForm</code>, <code>TaskList</code> — inside a scrollable <code>Column</code>.</p>
+      <pre><code>SectionLabel("4. Lists with LazyColumn")
+TaskList(
+    modifier = Modifier
+        .fillMaxWidth()
+        .height(300.dp)
+)</code></pre>
+      <div class="callout">
+        <strong>Why <code>TaskList</code> gets an explicit <code>.height(300.dp)</code>.</strong> The outer <code>Column</code> is already scrollable (<code>.verticalScroll(rememberScrollState())</code>), and <code>TaskList</code> is itself a scrollable <code>LazyColumn</code>. Giving <code>TaskList</code> an unbounded size here — e.g. wrapping it in a <code>Box(Modifier.fillMaxSize())</code> — puts one scrollable with unbounded height inside another, which Compose can't measure and crashes at runtime with an <code>IllegalStateException</code>. A fixed (or otherwise bounded, e.g. via <code>Modifier.weight()</code> in a non-scrolling parent) height is what makes a lazy list safe to nest inside a scrolling column.
+      </div>
+    </section>
+
+    <section id="theme-files">
+      <h2><code>ui/theme/</code> files</h2>
+      <span class="file-path">/app/src/main/java/com/example/composetutorial/ui/theme/</span>
+      <p>Three small files that together define the app's visual identity through Material 3's theming system.</p>
+      <div class="grid-2">
+        <div class="card">
+          <strong>Color.kt</strong>
+          <p style="margin-bottom:0">Raw <code>Color(0x…)</code> constants for a light and a dark palette — just values, no logic.</p>
+        </div>
+        <div class="card">
+          <strong>Type.kt</strong>
+          <p style="margin-bottom:0">A <code>Typography</code> object overriding a few of Material 3's named text styles (<code>bodyLarge</code>, <code>titleLarge</code>, <code>labelSmall</code>) with this app's font sizes and weights.</p>
+        </div>
+      </div>
+      <div class="card">
+        <strong>Theme.kt</strong>
+        <p>Defines <code>ComposeTutorialTheme</code>, a composable wrapper you call once at the root of the app. It picks a light or dark <code>ColorScheme</code> (respecting the system setting, and even Android 12+'s wallpaper-based "dynamic color" if available), then hands colors + typography to Compose's <code>MaterialTheme</code>:</p>
+        <pre><code>MaterialTheme(
+    colorScheme = colorScheme,
+    typography = AppTypography,
+    content = content
+)</code></pre>
+        <p style="margin-bottom:0">Every composable inside <code>content</code> can now read <code>MaterialTheme.colorScheme.primary</code>, <code>MaterialTheme.typography.bodyLarge</code>, etc., instead of hardcoding colors and fonts.</p>
+      </div>
+    </section>
+
+    <section id="components">
+      <h2><code>components/</code> files</h2>
+      <span class="file-path">/app/src/main/java/com/example/composetutorial/components/</span>
+      <p>Four small, focused composables, each demonstrating one core Compose idea. <code>MainActivity.kt</code> assembles all four into one screen.</p>
+
+      <h3>GreetingCard.kt</h3>
+      <p><strong>Idea: a stateless composable.</strong> It takes a <code>name</code> parameter in and emits a Material <code>Card</code> with two lines of text — nothing else. It owns no state and has no side effects, which makes it trivial to reuse and to preview with different inputs.</p>
+
+      <h3>CounterButton.kt</h3>
+      <p><strong>Idea: state and recomposition.</strong> Holds a counter with <code>remember { mutableIntStateOf(0) }</code>. Tapping the button increments it; because the composable <em>reads</em> that state, Compose automatically re-invokes (recomposes) just this small piece of UI whenever it changes.</p>
+
+      <h3>ProfileForm.kt</h3>
+      <p><strong>Idea: state hoisting.</strong> A text field whose current value is stored in a <code>remember { mutableStateOf("") }</code> outside the <code>OutlinedTextField</code> itself, then passed back in via <code>value</code> / <code>onValueChange</code>. The text field doesn't manage its own state — the caller does — which is the standard, testable pattern for interactive Compose UI.</p>
+
+      <h3>TaskList.kt</h3>
+      <p><strong>Idea: efficient lists.</strong> Uses <code>LazyColumn</code> (Compose's equivalent of <code>RecyclerView</code>) backed by a <code>mutableStateListOf</code> of a small <code>Task</code> data class, so only the items currently on screen are composed, and toggling a checkbox updates just that row.</p>
+    </section>
+
+    <hr class="divider">
+
+    <section id="what-is-compose">
+      <h2>What Jetpack Compose is</h2>
+      <p>Jetpack Compose is Google's modern UI toolkit for Android, built entirely in Kotlin. It replaces the old View system (XML layouts + <code>Activity</code>/<code>Fragment</code> glue code) with a <strong>declarative</strong> model borrowed from frameworks like React and Flutter:</p>
+      <table>
+        <tr><th></th><th>Classic Views (imperative)</th><th>Compose (declarative)</th></tr>
+        <tr><td>How you build UI</td><td>XML layout files + Kotlin/Java code that mutates views</td><td>Kotlin functions that describe UI for the current state</td></tr>
+        <tr><td>Updating the UI</td><td>You manually call <code>setText()</code>, <code>setVisibility()</code>, etc.</td><td>You change state; Compose re-runs the relevant function(s) automatically</td></tr>
+        <tr><td>Reuse</td><td>Custom View subclasses, <code>&lt;include&gt;</code></td><td>Plain Kotlin functions</td></tr>
+      </table>
+      <p>Because UI is just a function of state, most Compose bugs collapse into a much smaller, more familiar problem: "is my state correct?" — rather than "did I forget to update this one view?"</p>
+    </section>
+
+    <section id="composable-functions">
+      <h2>Composable functions</h2>
+      <p>A <strong>composable function</strong> is any function annotated <code>@Composable</code>. It describes a piece of UI by calling other composables:</p>
+      <pre><code>@Composable
+fun GreetingCard(name: String, modifier: Modifier = Modifier) {
+    Card(modifier = modifier) {
+        Text("Hello, $name")
+    }
+}</code></pre>
+      <ul>
+        <li>Composable functions can be called only from other composable functions (or from an entry point like <code>setContent { }</code>).</li>
+        <li>They can run <strong>in any order</strong>, <strong>in parallel</strong>, and <strong>more than once</strong> — so they should avoid side effects and just describe UI from their inputs.</li>
+        <li>By convention they take a trailing <code>modifier: Modifier = Modifier</code> parameter (see <a href="#modifiers">Modifiers</a>) so the caller controls layout.</li>
+      </ul>
+    </section>
+
+    <section id="state">
+      <h2>State &amp; recomposition</h2>
+      <p><strong>Recomposition</strong> is the process of re-running composable functions when the state they read changes, so the UI on screen stays in sync with app state. The key building block is <code>mutableStateOf</code>:</p>
+      <pre><code>var count by remember { mutableIntStateOf(0) }
+
+Button(onClick = { count++ }) { Text("Tap me") }
+Text("Clicked $count times")   // re-runs whenever count changes</code></pre>
+      <ul>
+        <li><code>mutableStateOf</code> (and the specialized <code>mutableIntStateOf</code>, <code>mutableStateListOf</code>, etc.) creates <strong>observable</strong> state — Compose tracks every composable that reads it.</li>
+        <li><code>remember { … }</code> caches that state across recompositions of the <em>same</em> composable instance — without it, the state would reset to its initial value every time the function re-ran.</li>
+        <li><code>remember</code> does <strong>not</strong> survive configuration changes (like a screen rotation) or process death — for that you'd use <code>rememberSaveable</code> instead.</li>
+      </ul>
+      <div class="callout"><strong>Smart recomposition:</strong> Compose only re-runs the composables that actually read the changed state, not the whole screen — which is why UI stays fast even in large apps.</div>
+    </section>
+
+    <section id="modifiers">
+      <h2>Modifiers</h2>
+      <p>A <code>Modifier</code> is a chainable set of instructions that decorate or configure how a composable is measured, laid out, drawn, or reacts to input — padding, size, click handling, background color, and more:</p>
+      <pre><code>Text(
+    text = "Hello",
+    modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)
+        .background(Color.LightGray)
+        .clickable { /* ... */ }
+)</code></pre>
+      <p><strong>Order matters</strong> — each modifier wraps the result of the one before it, so <code>padding().background()</code> paints the background <em>outside</em> the padding, while <code>background().padding()</code> paints it <em>inside</em>. Every layout composable in this project accepts an optional <code>modifier</code> parameter for exactly this reason: it lets the parent control spacing and sizing without the child needing to know about its context.</p>
+    </section>
+
+    <section id="layouts">
+      <h2>Layouts: Column, Row, Box</h2>
+      <p>Compose has three foundational layout composables, roughly parallel to LinearLayout and FrameLayout in the old View system:</p>
+      <table>
+        <tr><th>Composable</th><th>Arranges children…</th></tr>
+        <tr><td><code>Column</code></td><td>vertically, top to bottom</td></tr>
+        <tr><td><code>Row</code></td><td>horizontally, left to right</td></tr>
+        <tr><td><code>Box</code></td><td>stacked on top of each other (for overlays, badges, etc.)</td></tr>
+      </table>
+      <p>All three accept <code>Arrangement</code> (spacing between children) and <code>Alignment</code> (how children align on the cross-axis) parameters. <code>MainActivity.kt</code> uses a <code>Column</code> with <code>Arrangement.spacedBy(4.dp)</code> to lay out the tutorial's sections, and <code>TaskList.kt</code>'s row uses <code>Alignment.CenterVertically</code> to align a checkbox with its label.</p>
+    </section>
+
+    <section id="lists">
+      <h2>Lists: LazyColumn</h2>
+      <p>For lists that can be long or unbounded, use <code>LazyColumn</code> (or <code>LazyRow</code>) instead of a <code>Column</code> with a loop. "Lazy" means it only composes and measures the items that are actually visible on screen, recycling composables as the user scrolls — the direct analogue of <code>RecyclerView</code>.</p>
+      <pre><code>LazyColumn {
+    items(tasks) { task ->
+        TaskRow(task = task, onToggle = { /* ... */ })
+    }
+}</code></pre>
+      <div class="callout">Using a plain <code>Column</code> for a large or growing list composes every item up front, which wastes memory and CPU. <code>LazyColumn</code> is the correct default whenever the list size isn't small and fixed.</div>
+    </section>
+
+    <section id="material3">
+      <h2>Material 3 components</h2>
+      <p>The <code>androidx.compose.material3</code> library provides ready-made, theme-aware UI components implementing Google's Material Design 3 spec. This project uses:</p>
+      <table>
+        <tr><th>Component</th><th>Used for</th></tr>
+        <tr><td><code>Scaffold</code></td><td>Top-level screen structure (top bar, content insets)</td></tr>
+        <tr><td><code>TopAppBar</code></td><td>The title bar at the top of the screen</td></tr>
+        <tr><td><code>Card</code></td><td>An elevated surface for grouped content</td></tr>
+        <tr><td><code>Button</code></td><td>A clickable, filled call-to-action</td></tr>
+        <tr><td><code>OutlinedTextField</code></td><td>Single-line text input</td></tr>
+        <tr><td><code>Checkbox</code></td><td>Boolean toggle inside each task row</td></tr>
+      </table>
+      <p>Every one of these automatically picks up colors from <code>MaterialTheme.colorScheme</code> and text styles from <code>MaterialTheme.typography</code> — which is exactly what <a href="#theme-files">Theme.kt</a> configures.</p>
+    </section>
+
+    <section id="theming">
+      <h2>Theming</h2>
+      <p>Compose theming flows one direction: you set it once, near the root (<code>ComposeTutorialTheme { … }</code> in <code>MainActivity</code>), and every composable underneath reads from it via <code>MaterialTheme.colorScheme</code> / <code>MaterialTheme.typography</code> / <code>MaterialTheme.shapes</code>. This is why none of the four component files hardcode a single color or font — they all defer to the theme, so switching to dark mode, or restyling the whole app, means editing <code>Theme.kt</code> and <code>Color.kt</code> in one place rather than hunting through every screen.</p>
+    </section>
+
+    <section id="previews">
+      <h2>Previews</h2>
+      <p>Any composable annotated <code>@Preview</code> can be rendered by Android Studio's Design pane <strong>without building or running the app</strong> — no emulator, no device, often in under a second. Every file in <code>components/</code> ends with one:</p>
+      <pre><code>@Preview(showBackground = true)
+@Composable
+private fun GreetingCardPreview() {
+    ComposeTutorialTheme {
+        GreetingCard(name = "Jetpack Compose")
+    }
+}</code></pre>
+      <p>Wrapping the preview in the app's theme (as shown above) ensures it looks exactly as it will at runtime. You can stack multiple <code>@Preview</code> annotations on one function to preview it in light/dark mode, different font scales, or different device sizes side by side.</p>
+    </section>
+
+    <hr class="divider">
+
+    <section id="exercises">
+      <h2>Try it yourself</h2>
+      <ol>
+        <li>Add a fifth section to <code>TutorialApp()</code> using a new composable you write from scratch — start with something stateless, like <code>GreetingCard</code>.</li>
+        <li>Give <code>CounterButton</code> a "Reset" button that sets <code>count</code> back to <code>0</code>.</li>
+        <li>Add a delete icon to each <code>TaskRow</code> in <code>TaskList.kt</code> that removes it from the <code>mutableStateListOf</code>.</li>
+        <li>Change <code>PurpleLight</code> in <code>Color.kt</code> to a different hue and watch every themed component update.</li>
+        <li>Add a second <code>@Preview(uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)</code> to a component to preview it in dark mode.</li>
+      </ol>
+    </section>
+
+    <section id="resources">
+      <h2>Further resources</h2>
+      <ul>
+        <li><a href="https://developer.android.com/jetpack/compose" target="_blank" rel="noopener">Official Jetpack Compose documentation</a></li>
+        <li><a href="https://developer.android.com/jetpack/compose/mental-model" target="_blank" rel="noopener">Compose's declarative mental model</a></li>
+        <li><a href="https://developer.android.com/jetpack/compose/state" target="_blank" rel="noopener">State and Jetpack Compose</a></li>
+        <li><a href="https://m3.material.io/" target="_blank" rel="noopener">Material Design 3</a></li>
+      </ul>
+      <footer>
+        <p><a class="top-link" href="#intro">↑ Back to top</a></p>
+      </footer>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Highlight the active section link as the user scrolls.
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#sidebar a'));
+    var sections = links
+      .map(function (l) { return document.querySelector(l.getAttribute('href')); })
+      .filter(Boolean);
+
+    function onScroll() {
+      var scrollPos = window.scrollY + 100;
+      var current = sections[0];
+      for (var i = 0; i < sections.length; i++) {
+        if (sections[i].offsetTop <= scrollPos) current = sections[i];
+      }
+      links.forEach(function (l) {
+        l.classList.toggle('active', l.getAttribute('href') === '#' + current.id);
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+</script>
+</body>
+</html>
